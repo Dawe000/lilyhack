@@ -1,4 +1,5 @@
 import Link from "next/link";
+import CodeBlock from "@/app/components/CodeBlock";
 
 export default function ProjectStarters() {
   return (
@@ -19,8 +20,7 @@ export default function ProjectStarters() {
 
         <div className="w-full">
           <h2 className="text-2xl font-bold mb-6">File Organizer Starter</h2>
-          <div className="border border-black/[.08] dark:border-white/[.145] rounded-lg p-6 bg-gray-50 dark:bg-gray-800 font-mono text-sm overflow-auto">
-            <pre className="whitespace-pre">{`import os
+          <CodeBlock code={`import os
 import shutil
 import argparse
 from datetime import datetime
@@ -95,8 +95,7 @@ def main():
 
 if __name__ == "__main__":
     main()
-`}</pre>
-          </div>
+`} />
           <p className="mt-4 text-sm text-gray-600 dark:text-gray-300">
             Save this as <code>file_organizer.py</code> and run with <code>python file_organizer.py /path/to/directory --by ext</code> or <code>--by date</code>
           </p>
@@ -104,8 +103,7 @@ if __name__ == "__main__":
 
         <div className="w-full">
           <h2 className="text-2xl font-bold mb-6">Command Line Journal Starter</h2>
-          <div className="border border-black/[.08] dark:border-white/[.145] rounded-lg p-6 bg-gray-50 dark:bg-gray-800 font-mono text-sm overflow-auto">
-            <pre className="whitespace-pre">{`import os
+          <CodeBlock code={`import os
 import json
 import argparse
 from datetime import datetime
@@ -186,8 +184,7 @@ def main():
 
 if __name__ == "__main__":
     main()
-`}</pre>
-          </div>
+`} />
           <p className="mt-4 text-sm text-gray-600 dark:text-gray-300">
             Save this as <code>journal.py</code> and run with <code>python journal.py add "Your entry here"</code> or <code>python journal.py list</code>
           </p>
@@ -195,8 +192,7 @@ if __name__ == "__main__":
 
         <div className="w-full">
           <h2 className="text-2xl font-bold mb-6">Text Analyzer Starter</h2>
-          <div className="border border-black/[.08] dark:border-white/[.145] rounded-lg p-6 bg-gray-50 dark:bg-gray-800 font-mono text-sm overflow-auto">
-            <pre className="whitespace-pre">{`import os
+          <CodeBlock code={`import os
 import argparse
 import re
 from collections import Counter
@@ -260,8 +256,7 @@ def main():
 
 if __name__ == "__main__":
     main()
-`}</pre>
-          </div>
+`} />
           <p className="mt-4 text-sm text-gray-600 dark:text-gray-300">
             Save this as <code>text_analyzer.py</code> and run with <code>python text_analyzer.py your_text_file.txt</code>
           </p>

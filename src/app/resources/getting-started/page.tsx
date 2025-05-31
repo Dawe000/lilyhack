@@ -1,4 +1,5 @@
 import Link from "next/link";
+import CodeBlock from "@/app/components/CodeBlock";
 
 export default function GettingStarted() {
   return (
@@ -50,8 +51,7 @@ export default function GettingStarted() {
           </p>
           
           <h3 className="text-xl font-semibold mb-3">Setting Up a New Project with Git</h3>
-          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-md font-mono text-sm mb-6">
-            <pre className="whitespace-pre">{`# Create a new project folder
+          <CodeBlock code={`# Create a new project folder
 mkdir my-python-project
 cd my-python-project
 
@@ -62,12 +62,10 @@ git init
 touch hello.py
 
 # Open VS Code in the current directory
-code .`}</pre>
-          </div>
+code .`} />
           
           <h3 className="text-xl font-semibold mb-3">Basic Git Workflow</h3>
-          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-md font-mono text-sm mb-6">
-            <pre className="whitespace-pre">{`# Check status of your files
+          <CodeBlock code={`# Check status of your files
 git status
 
 # Add files to staging area
@@ -79,8 +77,7 @@ git add .
 git commit -m "Add hello world script"
 
 # See your commit history
-git log`}</pre>
-          </div>
+git log`} />
           
           <h3 className="text-xl font-semibold mb-3">Git in VS Code</h3>
           <p className="mb-4 text-gray-600 dark:text-gray-300">
@@ -101,11 +98,9 @@ git log`}</pre>
           <p className="mb-4 text-gray-600 dark:text-gray-300">
             Create a file named <code>hello.py</code> with the following content:
           </p>
-          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-md font-mono text-sm mb-6">
-            <pre className="whitespace-pre">{`print("Hello, world!")
+          <CodeBlock code={`print("Hello, world!")
 name = input("What's your name? ")
-print(f"Nice to meet you, {name}!")`}</pre>
-          </div>
+print(f"Nice to meet you, {name}!")`} />
           <p className="mb-4 text-gray-600 dark:text-gray-300">
             Run it by typing <code>python hello.py</code> in the VS Code terminal.
           </p>
@@ -126,8 +121,7 @@ print(f"Nice to meet you, {name}!")`}</pre>
           </p>
           
           <h3 className="text-xl font-semibold mb-3">Basic pip Commands</h3>
-          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-md font-mono text-sm mb-6">
-            <pre className="whitespace-pre">{`# Install a package
+          <CodeBlock code={`# Install a package
 pip install requests
 
 # Install multiple packages
@@ -137,21 +131,18 @@ pip install pandas matplotlib
 pip list
 
 # Uninstall a package
-pip uninstall requests`}</pre>
-          </div>
+pip uninstall requests`} />
           
           <h3 className="text-xl font-semibold mb-3">Using Installed Packages</h3>
           <p className="mb-4 text-gray-600 dark:text-gray-300">
             After installing a package, you can import it in your Python code:
           </p>
-          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-md font-mono text-sm mb-6">
-            <pre className="whitespace-pre">{`# Example using requests package
+          <CodeBlock code={`# Example using requests package
 import requests
 
 response = requests.get("https://api.github.com")
 print(f"GitHub API Status: {response.status_code}")
-print(response.json())`}</pre>
-          </div>
+print(response.json())`} />
         </div>
 
         <div className="w-full border border-black/[.08] dark:border-white/[.145] rounded-lg p-6 hover:shadow-md transition-shadow">
@@ -170,16 +161,14 @@ print(response.json())`}</pre>
           </ol>
           
           <h3 className="text-xl font-semibold mb-3">Pushing to GitHub</h3>
-          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-md font-mono text-sm mb-6">
-            <pre className="whitespace-pre">{`# Add the GitHub repository as a remote
+          <CodeBlock code={`# Add the GitHub repository as a remote
 git remote add origin https://github.com/yourusername/your-repo-name.git
 
 # Push your code to GitHub
 git push -u origin main
 
 # For subsequent pushes, you can just use:
-git push`}</pre>
-          </div>
+git push`} />
           
           <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-md mb-6">
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">💡 <strong>Tip:</strong> VS Code has a built-in GitHub extension that makes this process even easier. Click the Source Control icon, then click "Publish to GitHub".</p>
