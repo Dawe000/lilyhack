@@ -41,7 +41,7 @@ export default function ChatInterface() {
       const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout (reduced)
       
       // Add retry logic
-      let retries = 1;
+      let retries = 2; // Increased to 2 retries
       let response: Response | undefined;
       let lastError;
       
@@ -59,7 +59,19 @@ export default function ChatInterface() {
             signal: controller.signal
           });
           
-          // If we got a response, break out of retry loop
+          // Check if we got a 500 status - if so, retry
+          if (response.status === 500) {
+            console.log(`Received 500 error, retries left: ${retries}`);
+            if (retries <= 0) {
+              throw new Error('Server returned a 500 error');
+            }
+            retries--;
+            // Small wait before retry
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            continue;
+          }
+          
+          // If we got a successful response, break out of retry loop
           break;
         } catch (err: any) {
           lastError = err;
@@ -70,8 +82,8 @@ export default function ChatInterface() {
           }
           
           retries--;
-          // Small wait before retry
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          // Small wait before retry with increasing delay
+          await new Promise(resolve => setTimeout(resolve, 1500 + (2 - retries) * 1000));
         }
       }
       
@@ -105,32 +117,49 @@ export default function ChatInterface() {
         // First, check if we got plain text (like "Internal Server Error")
         if (text.trim() && !text.includes('{') && !text.includes('}')) {
           console.error('Received plain text instead of JSON:', text);
-          throw new Error(`Server returned: ${text}`);
-        }
-        
-        if (text.trim()) {
+          
+          // If we received a plain text response, create our own JSON
+          // This handles Cloudflare's raw error messages
+          data = {
+            message: "I'm having trouble connecting to my brain right now. Please try again in a moment!",
+            success: false,
+            error: text
+          };
+        } else if (text.trim()) {
           try {
             data = JSON.parse(text);
             console.log('Successfully parsed API response JSON:', data);
           } catch (jsonError: any) {
             console.error('JSON parse error:', jsonError);
             console.error('Raw text that failed to parse:', text);
-            throw new Error('Failed to parse server response as JSON');
+            
+            // If JSON parsing fails, create a fallback response
+            data = {
+              message: "Sorry, I received a response I couldn't understand. Let's try again!",
+              success: false,
+              error: 'JSON parse error'
+            };
           }
         } else {
           console.error('Empty response from server');
-          throw new Error('Empty response from server');
+          data = {
+            message: "I didn't receive any response from my brain. Let's try again!",
+            success: false,
+            error: 'Empty response'
+          };
         }
       } catch (parseError: any) {
         console.error('Error parsing response:', parseError);
-        throw new Error(`Failed to parse server response: ${parseError.message}`);
+        
+        // Final fallback if everything else fails
+        data = {
+          message: "Something went wrong with our conversation. Let's start fresh!",
+          success: false,
+          error: parseError.message
+        };
       }
       
       // Add assistant response to the chat
-      setMessages((prev) => [
-        ...prev,
-        { role: 'assistant', content: data.message || 'I received your message but couldn\'t generate a proper response.' }
-      ]);
       setMessages((prev) => [
         ...prev,
         { role: 'assistant', content: data.message || 'I received your message but couldn\'t generate a proper response.' }

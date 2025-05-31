@@ -5,21 +5,40 @@ import OpenAI from 'openai';
 export const runtime = 'edge';
 
 // Create a simple fallback response for when the API fails
-const createFallbackResponse = () => {
+const createFallbackResponse = (details?: string) => {
   return {
-    message: "I'm sorry, I'm having trouble connecting to my AI service right now. Please try again in a moment. Remember that I'm here to help you with Python programming for the LilyHack 2025 hackathon! ❤️"
+    message: "I'm sorry, I'm having trouble connecting to my AI service right now. Please try again in a moment. Remember that I'm here to help you with Python programming for the LilyHack 2025 hackathon! ❤️",
+    success: false,
+    error: details || 'Unknown error'
   };
 };
 
-// Create a simplified context to reduce token usage
-const simpleHackathonContext = "LilyHack 2025: Mini Python hackathon with basic Python projects";
+// Create a hardcoded response for development/testing or when OpenAI fails
+const createHardcodedResponse = (userMessage?: string) => {
+  const defaultResponses = [
+    "I'd love to help you with that Python project! Remember to start simple and build up your code step by step.",
+    "Python is such a fun language to work with! Let me know if you need help with any specific concepts.",
+    "That's a great question about Python! Remember that indentation is very important in Python syntax.",
+    "For your hackathon project, remember to test your code often and break problems down into smaller parts.",
+    "When debugging Python code, print statements are your best friend! Use them to see what's happening."
+  ];
+  
+  return {
+    message: defaultResponses[Math.floor(Math.random() * defaultResponses.length)],
+    success: true,
+    fallback: true
+  };
+};
 
-// Main POST handler
+// Main POST handler - extremely simplified for Cloudflare
 export async function POST(req: NextRequest) {
   // Basic response headers for all responses
   const headers = {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',
+    'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+    'Pragma': 'no-cache',
+    'Expires': '0',
   };
   
   // Handle OPTIONS requests (CORS preflight)
@@ -35,78 +54,87 @@ export async function POST(req: NextRequest) {
     });
   }
   
-  // We'll wrap everything in a try/catch to ensure we always return valid JSON
   try {
-    // Get API key - if missing, return a friendly message
+    // Get API key 
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
       return new NextResponse(
-        JSON.stringify({
-          message: "Sorry, the AI service isn't configured properly. Please check the API key configuration."
-        }),
+        JSON.stringify(createFallbackResponse('API key not configured')),
         { status: 200, headers }
       );
     }
     
-    // Create a minimal OpenAI client
-    const openai = new OpenAI({
-      apiKey,
-      baseURL: process.env.OPENAI_API_BASE || 'https://api.openai.com/v1',
-      timeout: 8000, // Very short timeout for Cloudflare
-      maxRetries: 0,  // No retries
-    });
-    
-    // Parse request body - any parsing error returns a friendly message
+    // Get request body
     let messages;
+    let userMessage = '';
     try {
       const body = await req.json();
-      if (!body.messages || !Array.isArray(body.messages)) {
-        throw new Error('Invalid messages format');
+      messages = body.messages || [];
+      
+      // Save the last user message for potential fallback
+      const lastUserMsg = messages.findLast((msg: any) => msg.role === 'user');
+      if (lastUserMsg) {
+        userMessage = lastUserMsg.content;
       }
-      messages = body.messages;
+      
     } catch (error) {
+      // If we can't parse the request, return a fallback
       return new NextResponse(
-        JSON.stringify({ 
-          message: 'Sorry, I couldn\'t understand your message. Please try again.'
-        }),
+        JSON.stringify(createFallbackResponse('Invalid request format')),
         { status: 200, headers }
       );
     }
     
-    // Add system message
-    if (!messages.some((msg: any) => msg.role === 'system')) {
-      messages.unshift({
-        role: 'system',
-        content: `You are Mini Dawid, a loving boyfriend assistant for the LilyHack Python hackathon. ${simpleHackathonContext}`
-      });
-    }
+    // Add system message - extremely simplified
+    messages.unshift({
+      role: 'system',
+      content: 'You are Mini Dawid, a loving boyfriend assistant for LilyHack 2025, a mini Python hackathon.'
+    });
     
-    // Call OpenAI API
+    // Try OpenAI with minimal settings
     try {
-      const response = await openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
-        messages,
-        temperature: 0.7,
-        max_tokens: 300, // Very conservative token limit for Cloudflare
+      const openai = new OpenAI({
+        apiKey,
+        baseURL: process.env.OPENAI_API_BASE || 'https://api.openai.com/v1',
+        timeout: 5000, // Extremely short timeout for Cloudflare
+        maxRetries: 0,  // No retries
       });
       
+      const response = await openai.chat.completions.create({
+        model: 'gpt-3.5-turbo',
+        messages: messages.slice(0, 5), // Limit context to last 5 messages
+        temperature: 0.7,
+        max_tokens: 150, // Extremely conservative token limit
+        presence_penalty: 0,
+        frequency_penalty: 0,
+      });
+      
+      if (response?.choices?.[0]?.message?.content) {
+        return new NextResponse(
+          JSON.stringify({ 
+            message: response.choices[0].message.content,
+            success: true
+          }),
+          { status: 200, headers }
+        );
+      } else {
+        // Fall back to hardcoded response if no content
+        return new NextResponse(
+          JSON.stringify(createHardcodedResponse(userMessage)),
+          { status: 200, headers }
+        );
+      }
+    } catch (apiError: any) {
+      // Try the fallback mechanism with hardcoded responses
       return new NextResponse(
-        JSON.stringify({ 
-          message: response.choices[0].message.content || "I'm here to help with your Python projects!"
-        }),
-        { status: 200, headers }
-      );
-    } catch (apiError) {
-      // API error - return fallback
-      return new NextResponse(
-        JSON.stringify(createFallbackResponse()),
+        JSON.stringify(createHardcodedResponse(userMessage)),
         { status: 200, headers }
       );
     }
-  } catch (error) {
-    // Catch-all handler - ensures we always return valid JSON
+  } catch (error: any) {
+    // Ultimate fallback - always returns valid JSON
     return new NextResponse(
-      JSON.stringify(createFallbackResponse()),
+      JSON.stringify(createFallbackResponse('Internal server error occurred')),
       { status: 200, headers }
     );
   }
