@@ -38,22 +38,54 @@ export default function ChatInterface() {
       // Send the conversation history to the API with a timeout
       console.log('Sending request to API...');
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout (reduced)
       
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          messages: [...messages, userMessage].filter(msg => msg.role !== 'system'),
-        }),
-        // These options are important for Cloudflare Pages
-        cache: 'no-store',
-        signal: controller.signal
-      });
+      // Add retry logic
+      let retries = 1;
+      let response: Response | undefined;
+      let lastError;
+      
+      while (retries >= 0) {
+        try {
+          response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              messages: [...messages, userMessage].filter(msg => msg.role !== 'system'),
+            }),
+            cache: 'no-store',
+            signal: controller.signal
+          });
+          
+          // If we got a response, break out of retry loop
+          break;
+        } catch (err: any) {
+          lastError = err;
+          console.log(`API request failed, retries left: ${retries}`, err);
+          
+          if (retries <= 0 || err.name === 'AbortError') {
+            throw err;
+          }
+          
+          retries--;
+          // Small wait before retry
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+      
+      // If we didn't get a response and have an error, throw it
+      if (!response && lastError) {
+        throw lastError;
+      }
       
       clearTimeout(timeoutId);
+      
+      // Make sure we have a response
+      if (!response) {
+        throw new Error('No response received from server');
+      }
       
       console.log('API response received, status:', response.status);
       console.log('API response headers:', 
@@ -70,6 +102,12 @@ export default function ChatInterface() {
       let data;
       
       try {
+        // First, check if we got plain text (like "Internal Server Error")
+        if (text.trim() && !text.includes('{') && !text.includes('}')) {
+          console.error('Received plain text instead of JSON:', text);
+          throw new Error(`Server returned: ${text}`);
+        }
+        
         if (text.trim()) {
           try {
             data = JSON.parse(text);
@@ -117,8 +155,13 @@ export default function ChatInterface() {
       
       if (error.name === 'AbortError') {
         errorMessage = 'The request took too long to complete. Please try again.';
+      } else if (error.message?.includes('Server returned: Internal Server Error')) {
+        errorMessage = 'The AI service is currently experiencing difficulties. Please try again in a few minutes.';
       } else if (error.message) {
-        errorMessage = error.message;
+        // Simplify the error message if it contains technical details
+        errorMessage = error.message
+          .replace('Failed to parse server response as JSON', 'There was a communication problem')
+          .replace('Failed to parse server response:', 'There was a problem:');
       }
       
       setMessages((prev) => [
