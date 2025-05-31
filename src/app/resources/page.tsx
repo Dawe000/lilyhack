@@ -22,6 +22,12 @@ export default function Resources() {
             >
               Project Starters
             </Link>
+            <Link 
+              href="/assistant"
+              className="text-sm bg-blue-600 text-white hover:bg-blue-700 px-3 py-1 rounded-full"
+            >
+              Python Assistant
+            </Link>
           </div>
           <Link 
             href="/"
