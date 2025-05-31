@@ -6,9 +6,21 @@ export const runtime = 'edge';
 
 // Initialize the OpenAI client with your API key and endpoint
 // Note: In production, you should use environment variables for these values
+const apiKey = process.env.OPENAI_API_KEY;
+const apiBase = process.env.OPENAI_API_BASE;
+
+// Validate required environment variables
+if (!apiKey) {
+  console.error("Missing OPENAI_API_KEY environment variable");
+}
+
+if (!apiBase) {
+  console.error("Missing OPENAI_API_BASE environment variable");
+}
+
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || 'your-api-key',
-  baseURL: process.env.OPENAI_API_BASE || 'https://api.openai.com/v1',
+  apiKey: apiKey || '',
+  baseURL: apiBase || 'https://api.openai.com/v1',
 });
 
 // Detailed context information about the hackathon and Python projects
@@ -110,7 +122,20 @@ PYTHON CONCEPTS COVERED:
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages } = await req.json();
+    // Parse the request JSON with error handling
+    let messages;
+    try {
+      const body = await req.json();
+      messages = body.messages;
+    } catch (parseError) {
+      console.error('Error parsing request JSON:', parseError);
+      return new NextResponse(JSON.stringify({ 
+        error: 'Invalid JSON in request body' 
+      }), { 
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
 
     // Add the context as a system message if it's not already there
     if (!messages.some((msg: any) => msg.role === 'system')) {
@@ -150,23 +175,48 @@ export async function POST(req: NextRequest) {
     }
 
     // Call the OpenAI API
-    const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo', // You can change this to your preferred model
-      messages: messages,
-      temperature: 0.7,
-      max_tokens: 800,
-    });
+    try {
+      // Log API request for debugging (only in development)
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('Calling OpenAI API with model: gpt-3.5-turbo');
+      }
+      
+      const response = await openai.chat.completions.create({
+        model: 'gpt-3.5-turbo', // You can change this to your preferred model
+        messages: messages,
+        temperature: 0.7,
+        max_tokens: 800,
+      });
 
-    // Return the AI response
-    return NextResponse.json({ 
-      message: response.choices[0].message.content,
-      usage: response.usage
-    });
+      // Return the AI response with explicit headers
+      return new NextResponse(JSON.stringify({ 
+        message: response.choices[0].message.content,
+        usage: response.usage
+      }), { 
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    } catch (apiError: any) {
+      console.error('Error calling OpenAI API:', apiError);
+      // Create a more detailed error response
+      const errorDetail = apiError.response?.data?.error?.message || 
+                          apiError.message || 
+                          'Unknown error when calling the AI service';
+      
+      return new NextResponse(JSON.stringify({ 
+        error: `Error communicating with AI service: ${errorDetail}` 
+      }), { 
+        status: 502,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
   } catch (error: any) {
-    console.error('Error in chat API:', error);
-    return NextResponse.json(
-      { error: error.message || 'An error occurred during the request' },
-      { status: 500 }
-    );
+    console.error('General error in chat API:', error);
+    return new NextResponse(JSON.stringify({ 
+      error: error.message || 'An unexpected error occurred' 
+    }), { 
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 }

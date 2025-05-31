@@ -46,24 +46,40 @@ export default function ChatInterface() {
         }),
       });
       
-      const data = await response.json();
+      let data;
+      try {
+        const text = await response.text();
+        // Add additional logging for debugging
+        console.log('API Response status:', response.status);
+        console.log('API Response text:', text.substring(0, 200) + (text.length > 200 ? '...' : ''));
+        
+        try {
+          data = JSON.parse(text);
+        } catch (jsonError) {
+          console.error('JSON parse error for text:', text);
+          throw new Error('Failed to parse server response as JSON');
+        }
+      } catch (parseError) {
+        console.error('Error parsing response:', parseError);
+        throw new Error('Failed to parse server response');
+      }
       
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to get a response');
+        throw new Error(data?.error || `Server error: ${response.status}`);
       }
       
       // Add assistant response to the chat
       setMessages((prev) => [
         ...prev,
-        { role: 'assistant', content: data.message }
+        { role: 'assistant', content: data.message || 'I received your message but couldn\'t generate a proper response.' }
       ]);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error sending message:', error);
       setMessages((prev) => [
         ...prev,
         { 
           role: 'assistant', 
-          content: 'Sorry, I encountered an error. Please try again later.' 
+          content: `Sorry sweetheart, I encountered an error: ${error.message || 'Unknown error'}. Please try again later.` 
         }
       ]);
     } finally {
