@@ -12,7 +12,7 @@ export default function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([
     { 
       role: 'assistant', 
-      content: 'Hi! I\'m LilyBot, your Python programming assistant for LilyHack 2025. How can I help you with your Python project today?' 
+      content: 'Hey sweetheart! 👋 I\'m Mini Dawid, your loving guide to Python programming. Dawid created me to help you through this hackathon with all the patience and support you need. What Python project would you like to work on today?' 
     }
   ]);
   const [isLoading, setIsLoading] = useState(false);
@@ -73,9 +73,9 @@ export default function ChatInterface() {
 
   return (
     <div className="w-full max-w-4xl mx-auto border border-black/[.08] dark:border-white/[.145] rounded-lg overflow-hidden shadow-md">
-      <div className="bg-blue-600 text-white p-4">
-        <h2 className="text-xl font-bold">LilyBot - Python Assistant</h2>
-        <p className="text-sm opacity-80">Ask me anything about Python or your hackathon project!</p>
+      <div className="bg-pink-600 text-white p-4">
+        <h2 className="text-xl font-bold">Mini Dawid - Your Python Companion ❤️</h2>
+        <p className="text-sm opacity-80">I'm here to help you with all your Python questions, sweetheart!</p>
       </div>
       
       {/* Chat messages */}
@@ -86,12 +86,11 @@ export default function ChatInterface() {
             className={`mb-4 ${
               message.role === 'user' ? 'text-right' : 'text-left'
             }`}
-          >
-            <div 
+          >              <div 
               className={`inline-block max-w-[80%] p-3 rounded-lg ${
                 message.role === 'user' 
                   ? 'bg-blue-500 text-white rounded-tr-none' 
-                  : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-tl-none'
+                  : 'bg-pink-100 dark:bg-pink-900 text-gray-800 dark:text-gray-200 rounded-tl-none'
               }`}
             >
               <p className="whitespace-pre-wrap break-words">{message.content}</p>
@@ -100,11 +99,11 @@ export default function ChatInterface() {
         ))}
         {isLoading && (
           <div className="text-left mb-4">
-            <div className="inline-block max-w-[80%] p-3 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-tl-none">
+            <div className="inline-block max-w-[80%] p-3 rounded-lg bg-pink-100 dark:bg-pink-900 text-gray-800 dark:text-gray-200 rounded-tl-none">
               <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce"></div>
-                <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                <div className="w-2 h-2 rounded-full bg-pink-400 animate-bounce"></div>
+                <div className="w-2 h-2 rounded-full bg-pink-400 animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                <div className="w-2 h-2 rounded-full bg-pink-400 animate-bounce" style={{ animationDelay: '0.4s' }}></div>
               </div>
             </div>
           </div>
@@ -118,14 +117,14 @@ export default function ChatInterface() {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask a question about Python..."
-          className="flex-grow p-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+          placeholder="Ask me anything about Python, love..."
+          className="flex-grow p-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-pink-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
           disabled={isLoading}
         />
         <button
           type="submit"
           disabled={isLoading}
-          className="bg-blue-600 text-white px-4 py-2 rounded-r-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 transition-colors"
+          className="bg-pink-600 text-white px-4 py-2 rounded-r-lg hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500 disabled:opacity-50 transition-colors"
         >
           Send
         </button>

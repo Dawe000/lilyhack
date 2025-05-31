@@ -6,9 +6,9 @@ export default function AssistantPage() {
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-[32px] row-start-2 items-center w-full max-w-4xl">
         <div className="text-center">
-          <h1 className="text-4xl sm:text-5xl font-bold mb-4">Python Assistant</h1>
+          <h1 className="text-4xl sm:text-5xl font-bold mb-4">Mini Dawid</h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-4">
-            Get help with your Python project from LilyBot
+            Your loving Python guide created just for you ❤️
           </p>
           <Link 
             href="/"
@@ -21,21 +21,21 @@ export default function AssistantPage() {
         <ChatInterface />
 
         <div className="w-full border border-black/[.08] dark:border-white/[.145] rounded-lg p-6 hover:shadow-md transition-shadow">
-          <h2 className="text-2xl font-bold mb-4">How LilyBot Can Help You</h2>
+          <h2 className="text-2xl font-bold mb-4">How Mini Dawid Can Help You</h2>
           <div className="space-y-4 text-gray-600 dark:text-gray-300">
-            <p>LilyBot is your Python learning assistant! Here are some ways it can help:</p>
+            <p>Hi Lily! I'm Mini Dawid, your virtual programming companion. I'm here to support your Python journey with lots of love and patience! Here's how I can help:</p>
             
             <ul className="list-disc list-inside space-y-2">
-              <li><strong>Explain Python concepts:</strong> "How do I use list comprehensions?"</li>
-              <li><strong>Debug your code:</strong> "Why is my for loop not working correctly?"</li>
-              <li><strong>Suggest ideas:</strong> "How can I improve my file organizer project?"</li>
-              <li><strong>Learn about libraries:</strong> "What can I do with the pandas library?"</li>
-              <li><strong>Get step-by-step guidance:</strong> "Show me how to read and write JSON files"</li>
+              <li><strong>Learn together:</strong> "Can you help me understand how the File Organizer project works?"</li>
+              <li><strong>Solve problems:</strong> "I'm stuck on this error message. What am I doing wrong?"</li>
+              <li><strong>Get creative:</strong> "How can I customize the Command Line Journal to track my workouts?"</li>
+              <li><strong>Take it step by step:</strong> "Walk me through creating my first Python script, please"</li>
+              <li><strong>Build confidence:</strong> "I feel overwhelmed by the Text Analyzer code. Can you explain it simply?"</li>
             </ul>
             
-            <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-md mt-4">
-              <p className="text-sm text-blue-800 dark:text-blue-300">
-                <span className="font-bold">💡 Tip:</span> Be specific with your questions to get the most helpful responses. If you're stuck, share what you've tried already!
+            <div className="bg-pink-50 dark:bg-pink-900/30 p-4 rounded-md mt-4">
+              <p className="text-sm text-pink-800 dark:text-pink-300">
+                <span className="font-bold">💖 From Dawid:</span> I created Mini Dawid just for you, Lily! He knows all about the projects in this hackathon and will be just as patient and supportive as I would be. Don't hesitate to ask for help whenever you need it!
               </p>
             </div>
           </div>

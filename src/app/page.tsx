@@ -126,8 +126,8 @@ export default function Home() {
           <a href="/resources" className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-6 sm:px-8">
             View Resources
           </a>
-          <a href="/assistant" className="rounded-full bg-blue-600 text-white transition-colors flex items-center justify-center hover:bg-blue-700 font-medium text-sm sm:text-base h-10 sm:h-12 px-6 sm:px-8">
-            Ask Python Assistant
+          <a href="/assistant" className="rounded-full bg-pink-600 text-white transition-colors flex items-center justify-center hover:bg-pink-700 font-medium text-sm sm:text-base h-10 sm:h-12 px-6 sm:px-8">
+            Ask Mini Dawid ❤️
           </a>
         </div>
       </main>

@@ -24,9 +24,9 @@ export default function Resources() {
             </Link>
             <Link 
               href="/assistant"
-              className="text-sm bg-blue-600 text-white hover:bg-blue-700 px-3 py-1 rounded-full"
+              className="text-sm bg-pink-600 text-white hover:bg-pink-700 px-3 py-1 rounded-full"
             >
-              Python Assistant
+              Mini Dawid ❤️
             </Link>
           </div>
           <Link 

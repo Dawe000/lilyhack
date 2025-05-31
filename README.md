@@ -11,7 +11,7 @@ A mini Python hackathon for my gf Lily :)
 - **Getting Started Guide**: VS Code, Python, and Git basics
 - **Learning Resources**: Documentation and tutorials for Python modules
 - **Project Starters**: Ready-to-use templates to kickstart development
-- **AI Python Assistant**: Interactive LilyBot to help with Python questions and project guidance
+- **AI Python Assistant**: Interactive Mini Dawid chatbot that provides loving guidance for Python projects
 
 ## Getting Started
 
