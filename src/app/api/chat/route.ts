@@ -55,6 +55,16 @@ export async function POST(req: NextRequest) {
   }
   
   try {
+    // Debug environment variables
+    const envDebug = {
+      apiKeyExists: !!process.env.OPENAI_API_KEY,
+      apiKeyLength: process.env.OPENAI_API_KEY?.length || 0,
+      apiBaseExists: !!process.env.OPENAI_API_BASE,
+      apiBaseValue: process.env.OPENAI_API_BASE || 'not set',
+      nodeEnv: process.env.NODE_ENV || 'not set'
+    };
+    console.log('Environment debug:', JSON.stringify(envDebug));
+    
     // Get API key 
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
@@ -93,11 +103,19 @@ export async function POST(req: NextRequest) {
     
     // Try OpenAI with minimal settings
     try {
-      const openai = new OpenAI({
-        apiKey,
+      // Log the API configuration we're about to use
+      console.log('OpenAI config:', JSON.stringify({
         baseURL: process.env.OPENAI_API_BASE || 'https://api.openai.com/v1',
-        timeout: 5000, // Extremely short timeout for Cloudflare
-        maxRetries: 0,  // No retries
+        timeout: 5000,
+        keyProvided: !!apiKey
+      }));
+      
+      // Create the OpenAI client with more robust error handling
+      const openai = new OpenAI({
+        apiKey: apiKey || 'invalid-key', // Prevent undefined errors
+        baseURL: process.env.OPENAI_API_BASE || 'https://api.openai.com/v1',
+        timeout: 10000, // Increased timeout
+        maxRetries: 2,  // Added some retries
       });
       
       const response = await openai.chat.completions.create({
@@ -125,6 +143,14 @@ export async function POST(req: NextRequest) {
         );
       }
     } catch (apiError: any) {
+      // Log detailed error information
+      console.error('OpenAI API Error:', JSON.stringify({
+        message: apiError.message || 'Unknown error',
+        type: apiError.type || 'unknown',
+        status: apiError.status || 'unknown',
+        stack: apiError.stack?.split('\n').slice(0, 3).join('\n') || 'No stack trace'
+      }));
+      
       // Try the fallback mechanism with hardcoded responses
       return new NextResponse(
         JSON.stringify(createHardcodedResponse(userMessage)),
@@ -132,6 +158,13 @@ export async function POST(req: NextRequest) {
       );
     }
   } catch (error: any) {
+    // Log detailed error information
+    console.error('Ultimate fallback error:', JSON.stringify({
+      message: error.message || 'Unknown error',
+      name: error.name || 'Unknown',
+      stack: error.stack?.split('\n').slice(0, 3).join('\n') || 'No stack trace'
+    }));
+    
     // Ultimate fallback - always returns valid JSON
     return new NextResponse(
       JSON.stringify(createFallbackResponse('Internal server error occurred')),
