@@ -20,6 +20,26 @@ export default function ProjectStarters() {
 
         <div className="w-full">
           <h2 className="text-2xl font-bold mb-6">File Organizer Starter</h2>
+          <div className="mb-4 text-gray-600 dark:text-gray-300">
+            <p className="mb-2">This tool helps you clean up messy folders by automatically organizing files based on their types or creation dates.</p>
+            
+            <h3 className="text-xl font-semibold mt-4 mb-2">What It Does:</h3>
+            <ul className="list-disc list-inside space-y-1 mb-4">
+              <li>Scans all files in a directory</li>
+              <li>Creates subfolders for each file type (e.g., jpg, pdf, txt)</li>
+              <li>Alternatively, organizes by creation date (year-month)</li>
+              <li>Moves files into appropriate folders</li>
+            </ul>
+            
+            <h3 className="text-xl font-semibold mt-4 mb-2">Key Python Concepts:</h3>
+            <ul className="list-disc list-inside space-y-1 mb-4">
+              <li><code>os</code> module for file operations</li>
+              <li><code>shutil</code> for moving files</li>
+              <li><code>argparse</code> for command-line arguments</li>
+              <li>File path manipulation</li>
+              <li>Working with file metadata (dates)</li>
+            </ul>
+          </div>
           <CodeBlock code={`import os
 import shutil
 import argparse
@@ -99,10 +119,36 @@ if __name__ == "__main__":
           <p className="mt-4 text-sm text-gray-600 dark:text-gray-300">
             Save this as <code>file_organizer.py</code> and run with <code>python file_organizer.py /path/to/directory --by ext</code> or <code>--by date</code>
           </p>
+          
+          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-md mt-4 mb-6">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-0">
+              <span className="font-bold">💡 Improvement ideas:</span> Add sorting by file size, add an "undo" feature, create a log file of all actions, or build a simple GUI using <code>tkinter</code>.
+            </p>
+          </div>
         </div>
 
         <div className="w-full">
           <h2 className="text-2xl font-bold mb-6">Command Line Journal Starter</h2>
+          <div className="mb-4 text-gray-600 dark:text-gray-300">
+            <p className="mb-2">A simple personal journal application that runs in your terminal, saving entries as structured JSON data.</p>
+            
+            <h3 className="text-xl font-semibold mt-4 mb-2">What It Does:</h3>
+            <ul className="list-disc list-inside space-y-1 mb-4">
+              <li>Records journal entries with timestamps</li>
+              <li>Stores all entries in a JSON file</li>
+              <li>Allows viewing entries by date</li>
+              <li>Uses subcommands for different operations</li>
+            </ul>
+            
+            <h3 className="text-xl font-semibold mt-4 mb-2">Key Python Concepts:</h3>
+            <ul className="list-disc list-inside space-y-1 mb-4">
+              <li><code>json</code> module for data storage</li>
+              <li><code>argparse</code> with subcommands</li>
+              <li>Working with dates and times</li>
+              <li>Organizing code with functions</li>
+              <li>File I/O with error handling</li>
+            </ul>
+          </div>
           <CodeBlock code={`import os
 import json
 import argparse
@@ -188,10 +234,36 @@ if __name__ == "__main__":
           <p className="mt-4 text-sm text-gray-600 dark:text-gray-300">
             Save this as <code>journal.py</code> and run with <code>python journal.py add "Your entry here"</code> or <code>python journal.py list</code>
           </p>
+          
+          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-md mt-4 mb-6">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-0">
+              <span className="font-bold">💡 Improvement ideas:</span> Add tags to entries, implement search functionality, add mood tracking, create a simple encryption for privacy, or add export options (markdown, txt).
+            </p>
+          </div>
         </div>
 
         <div className="w-full">
           <h2 className="text-2xl font-bold mb-6">Text Analyzer Starter</h2>
+          <div className="mb-4 text-gray-600 dark:text-gray-300">
+            <p className="mb-2">Analyzes text files to extract useful information and statistics about the content.</p>
+            
+            <h3 className="text-xl font-semibold mt-4 mb-2">What It Does:</h3>
+            <ul className="list-disc list-inside space-y-1 mb-4">
+              <li>Counts characters, words, and lines</li>
+              <li>Identifies the most frequent words</li>
+              <li>Calculates average word length</li>
+              <li>Handles errors gracefully</li>
+            </ul>
+            
+            <h3 className="text-xl font-semibold mt-4 mb-2">Key Python Concepts:</h3>
+            <ul className="list-disc list-inside space-y-1 mb-4">
+              <li>Regular expressions with the <code>re</code> module</li>
+              <li><code>collections.Counter</code> for frequency analysis</li>
+              <li>String manipulation</li>
+              <li>Try/except for error handling</li>
+              <li>Formatted output</li>
+            </ul>
+          </div>
           <CodeBlock code={`import os
 import argparse
 import re
@@ -260,6 +332,30 @@ if __name__ == "__main__":
           <p className="mt-4 text-sm text-gray-600 dark:text-gray-300">
             Save this as <code>text_analyzer.py</code> and run with <code>python text_analyzer.py your_text_file.txt</code>
           </p>
+          
+          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-md mt-4 mb-6">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-0">
+              <span className="font-bold">💡 Improvement ideas:</span> Add sentiment analysis, find common phrases, calculate readability scores, identify proper nouns, or create a word cloud visualization using <code>matplotlib</code>.
+            </p>
+          </div>
+        </div>
+
+        <div className="w-full border border-black/[.08] dark:border-white/[.145] rounded-lg p-6 hover:shadow-md transition-shadow">
+          <h2 className="text-2xl font-bold mb-4">Tips for Working with These Projects</h2>
+          
+          <div className="space-y-4 text-gray-600 dark:text-gray-300">
+            <p>Each of these starter projects demonstrates important Python concepts that you can build upon:</p>
+            
+            <ul className="list-disc list-inside space-y-2">
+              <li><strong>Understanding imports:</strong> Each project uses different Python modules – explore their documentation to discover more functionality</li>
+              <li><strong>Command-line arguments:</strong> All projects use <code>argparse</code> to create user-friendly command-line interfaces</li>
+              <li><strong>Error handling:</strong> Notice how the code anticipates potential problems using try/except blocks</li>
+              <li><strong>Code organization:</strong> Each project separates functionality into discrete functions</li>
+              <li><strong>Documentation:</strong> The code includes docstrings and comments to explain what each part does</li>
+            </ul>
+            
+            <p className="mt-4">Try running these projects, then modify them to add your own features. Don't worry about breaking things – that's part of the learning process!</p>
+          </div>
         </div>
 
         <div className="flex justify-center w-full">
