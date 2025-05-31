@@ -1,6 +1,17 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-Made a little hackathon for my girlfriend to get better at python :D
+# LilyHack 2025
+
+A mini Python hackathon website created to help someone get better at Python through fun, manageable coding challenges.
+
+## Features
+
+- **Hackathon Challenge Categories**: Four different focus areas for Python learning
+- **Project Ideas**: Simple, achievable Python project suggestions
+- **Getting Started Guide**: VS Code, Python, and Git basics
+- **Learning Resources**: Documentation and tutorials for Python modules
+- **Project Starters**: Ready-to-use templates to kickstart development
+- **Presentation Guidelines**: Tips for presenting completed projects
 
 ## Getting Started
 

@@ -9,6 +9,20 @@ export default function Resources() {
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-4">
             Helpful resources for your LilyHack Python projects
           </p>
+          <div className="flex flex-wrap gap-4 justify-center mb-4">
+            <Link 
+              href="/resources/getting-started"
+              className="text-sm text-blue-600 dark:text-blue-400 hover:underline px-3 py-1 border border-blue-200 dark:border-blue-800 rounded-full"
+            >
+              Getting Started Guide
+            </Link>
+            <Link 
+              href="/resources/starters"
+              className="text-sm text-blue-600 dark:text-blue-400 hover:underline px-3 py-1 border border-blue-200 dark:border-blue-800 rounded-full"
+            >
+              Project Starters
+            </Link>
+          </div>
           <Link 
             href="/"
             className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
