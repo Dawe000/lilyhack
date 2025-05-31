@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
+// Specify Edge Runtime for Cloudflare Pages compatibility
+export const runtime = 'edge';
+
 // Initialize the OpenAI client with your API key and endpoint
 // Note: In production, you should use environment variables for these values
 const openai = new OpenAI({
