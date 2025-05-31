@@ -7,7 +7,7 @@ export default function Home() {
         <div className="text-center">
           <h1 className="text-4xl sm:text-5xl font-bold mb-4">LilyHack 2025</h1>
           <p className="text-xl text-gray-600 dark:text-gray-300">
-            A Mini Hackathon Just for Us
+            A Mini Hackathon Just for You ❤️
           </p>
         </div>
 
