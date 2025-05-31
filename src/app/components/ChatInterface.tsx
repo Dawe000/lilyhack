@@ -35,7 +35,11 @@ export default function ChatInterface() {
     setIsLoading(true);
     
     try {
-      // Send the conversation history to the API
+      // Send the conversation history to the API with a timeout
+      console.log('Sending request to API...');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 second timeout
+      
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -46,42 +50,42 @@ export default function ChatInterface() {
         }),
         // These options are important for Cloudflare Pages
         cache: 'no-store',
+        signal: controller.signal
       });
       
+      clearTimeout(timeoutId);
+      
+      console.log('API response received, status:', response.status);
+      console.log('API response headers:', 
+        Array.from(response.headers.entries())
+          .map(([key, value]) => `${key}: ${value}`)
+          .join(', ')
+      );
+      
+      // Process the response
+      const text = await response.text();
+      console.log('API response text length:', text.length);
+      console.log('API response text preview:', text.substring(0, 150));
+      
       let data;
-      // Simplified error handling for Cloudflare compatibility
+      
       try {
-        // First check if the response is ok before attempting to parse
-        if (!response.ok) {
-          throw new Error(`Server error: ${response.status}`);
-        }
-        
-        const text = await response.text();
-        
-        // Only log in development to avoid console bloat in production
-        if (process.env.NODE_ENV !== 'production') {
-          console.log('API Response status:', response.status);
-          console.log('API Response text:', text.substring(0, 100) + (text.length > 100 ? '...' : ''));
-        }
-        
-        // Parse JSON with fallback for empty responses
         if (text.trim()) {
           try {
             data = JSON.parse(text);
-          } catch (jsonError) {
-            console.error('JSON parse error');
+            console.log('Successfully parsed API response JSON:', data);
+          } catch (jsonError: any) {
+            console.error('JSON parse error:', jsonError);
+            console.error('Raw text that failed to parse:', text);
             throw new Error('Failed to parse server response as JSON');
           }
         } else {
-          data = { message: 'Empty response from server' };
+          console.error('Empty response from server');
+          throw new Error('Empty response from server');
         }
-      } catch (parseError) {
-        console.error('Error handling response:', parseError);
-        throw parseError;
-      }
-      
-      if (!response.ok) {
-        throw new Error(data?.error || `Server error: ${response.status}`);
+      } catch (parseError: any) {
+        console.error('Error parsing response:', parseError);
+        throw new Error(`Failed to parse server response: ${parseError.message}`);
       }
       
       // Add assistant response to the chat
@@ -89,13 +93,39 @@ export default function ChatInterface() {
         ...prev,
         { role: 'assistant', content: data.message || 'I received your message but couldn\'t generate a proper response.' }
       ]);
+      setMessages((prev) => [
+        ...prev,
+        { role: 'assistant', content: data.message || 'I received your message but couldn\'t generate a proper response.' }
+      ]);
     } catch (error: any) {
       console.error('Error sending message:', error);
+      console.error('Error type:', typeof error);
+      console.error('Error name:', error.name);
+      console.error('Error message:', error.message);
+      
+      if (error.stack) {
+        console.error('Error stack:', error.stack);
+      }
+      
+      // Log network details if available
+      if (error.cause) {
+        console.error('Error cause:', error.cause);
+      }
+      
+      // Provide a friendly error message based on the type of error
+      let errorMessage = 'Unknown error';
+      
+      if (error.name === 'AbortError') {
+        errorMessage = 'The request took too long to complete. Please try again.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       setMessages((prev) => [
         ...prev,
         { 
           role: 'assistant', 
-          content: `Sorry sweetheart, I encountered an error: ${error.message || 'Unknown error'}. Please try again later.` 
+          content: `Sorry sweetheart, I encountered a problem: ${errorMessage}. Let's try again in a moment! ❤️` 
         }
       ]);
     } finally {
