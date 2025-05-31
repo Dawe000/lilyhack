@@ -7,6 +7,12 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ["sharp", "openai"],
   },
+  // Cloudflare Pages specific settings
+  reactStrictMode: true,
+  swcMinify: true, 
+  images: {
+    unoptimized: true, // Required for Cloudflare Pages
+  },
 };
 
 module.exports = nextConfig;

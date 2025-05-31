@@ -44,24 +44,40 @@ export default function ChatInterface() {
         body: JSON.stringify({
           messages: [...messages, userMessage].filter(msg => msg.role !== 'system'),
         }),
+        // These options are important for Cloudflare Pages
+        cache: 'no-store',
       });
       
       let data;
+      // Simplified error handling for Cloudflare compatibility
       try {
-        const text = await response.text();
-        // Add additional logging for debugging
-        console.log('API Response status:', response.status);
-        console.log('API Response text:', text.substring(0, 200) + (text.length > 200 ? '...' : ''));
+        // First check if the response is ok before attempting to parse
+        if (!response.ok) {
+          throw new Error(`Server error: ${response.status}`);
+        }
         
-        try {
-          data = JSON.parse(text);
-        } catch (jsonError) {
-          console.error('JSON parse error for text:', text);
-          throw new Error('Failed to parse server response as JSON');
+        const text = await response.text();
+        
+        // Only log in development to avoid console bloat in production
+        if (process.env.NODE_ENV !== 'production') {
+          console.log('API Response status:', response.status);
+          console.log('API Response text:', text.substring(0, 100) + (text.length > 100 ? '...' : ''));
+        }
+        
+        // Parse JSON with fallback for empty responses
+        if (text.trim()) {
+          try {
+            data = JSON.parse(text);
+          } catch (jsonError) {
+            console.error('JSON parse error');
+            throw new Error('Failed to parse server response as JSON');
+          }
+        } else {
+          data = { message: 'Empty response from server' };
         }
       } catch (parseError) {
-        console.error('Error parsing response:', parseError);
-        throw new Error('Failed to parse server response');
+        console.error('Error handling response:', parseError);
+        throw parseError;
       }
       
       if (!response.ok) {

@@ -4,6 +4,10 @@ import OpenAI from 'openai';
 // Specify Edge Runtime for Cloudflare Pages compatibility
 export const runtime = 'edge';
 
+// Additional config specific for Cloudflare Pages
+export const preferredRegion = 'auto';
+export const dynamic = 'force-dynamic';
+
 // Initialize the OpenAI client with your API key and endpoint
 // Note: In production, you should use environment variables for these values
 const apiKey = process.env.OPENAI_API_KEY;
@@ -18,9 +22,12 @@ if (!apiBase) {
   console.error("Missing OPENAI_API_BASE environment variable");
 }
 
+// Initialize OpenAI with more conservative settings
 const openai = new OpenAI({
   apiKey: apiKey || '',
   baseURL: apiBase || 'https://api.openai.com/v1',
+  timeout: 60000, // 60 second timeout
+  maxRetries: 2,
 });
 
 // Detailed context information about the hackathon and Python projects
@@ -126,6 +133,9 @@ export async function POST(req: NextRequest) {
     let messages;
     try {
       const body = await req.json();
+      if (!body.messages || !Array.isArray(body.messages)) {
+        throw new Error('Invalid or missing messages array');
+      }
       messages = body.messages;
     } catch (parseError) {
       console.error('Error parsing request JSON:', parseError);
@@ -133,7 +143,11 @@ export async function POST(req: NextRequest) {
         error: 'Invalid JSON in request body' 
       }), { 
         status: 400,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Cache-Control': 'no-cache, no-store, must-revalidate'
+        }
       });
     }
 
@@ -176,17 +190,26 @@ export async function POST(req: NextRequest) {
 
     // Call the OpenAI API
     try {
-      // Log API request for debugging (only in development)
-      if (process.env.NODE_ENV !== 'production') {
-        console.log('Calling OpenAI API with model: gpt-3.5-turbo');
-      }
+      // Simple model fallback mechanism for Cloudflare compatibility
+      let modelToUse = 'gpt-3.5-turbo';
       
-      const response = await openai.chat.completions.create({
-        model: 'gpt-3.5-turbo', // You can change this to your preferred model
+      const completionParams = {
+        model: modelToUse,
         messages: messages,
         temperature: 0.7,
         max_tokens: 800,
-      });
+      };
+      
+      // Add timeout to prevent hanging requests
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('API request timeout')), 25000)
+      );
+      
+      // Race between the actual API call and the timeout
+      const response = await Promise.race([
+        openai.chat.completions.create(completionParams),
+        timeoutPromise
+      ]) as any; // Use 'any' to avoid type issues
 
       // Return the AI response with explicit headers
       return new NextResponse(JSON.stringify({ 
@@ -194,20 +217,39 @@ export async function POST(req: NextRequest) {
         usage: response.usage
       }), { 
         status: 200,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Cache-Control': 'no-cache, no-store, must-revalidate'
+        }
       });
     } catch (apiError: any) {
       console.error('Error calling OpenAI API:', apiError);
+      
       // Create a more detailed error response
       const errorDetail = apiError.response?.data?.error?.message || 
                           apiError.message || 
                           'Unknown error when calling the AI service';
       
-      return new NextResponse(JSON.stringify({ 
-        error: `Error communicating with AI service: ${errorDetail}` 
-      }), { 
-        status: 502,
-        headers: { 'Content-Type': 'application/json' }
+      // Send more specific error messages for common issues
+      let status = 502;
+      let errorMessage = `Error communicating with AI service: ${errorDetail}`;
+      
+      if (errorDetail.includes('timeout')) {
+        status = 504;
+        errorMessage = 'The AI service took too long to respond. Please try again.';
+      } else if (errorDetail.includes('rate limit')) {
+        status = 429;
+        errorMessage = 'Too many requests to the AI service. Please try again in a moment.';
+      }
+      
+      return new NextResponse(JSON.stringify({ error: errorMessage }), { 
+        status,
+        headers: { 
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Cache-Control': 'no-cache, no-store, must-revalidate'
+        }
       });
     }
   } catch (error: any) {
